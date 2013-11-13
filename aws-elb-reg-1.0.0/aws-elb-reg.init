@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+# aws-elb-reg   Startup script for auto registration to AWS ELB
+#
+# chkconfig: 345 98 05
+# processname: aws-elb
+# description: for AWS Auto Scaling
+
+name="aws-elb-reg"
+prog="/usr/sbin/aws-elb-reg"
+var_subsys="/var/lock/subsys/$name"
+
+# config
+if [ -f /etc/sysconfig/$name ]; then
+    . /etc/sysconfig/$name
+fi
+
+start() {
+    touch $var_subsys
+    echo -n "Added to ELB: "
+    $prog add $TAG_ELB $AWS_API_ACCESS_KEY $AWS_API_SECRET_KEY
+}
+
+stop() {
+    echo -n "Deleted from ELB: "
+    $prog delete $TAG_ELB $AWS_API_ACCESS_KEY $AWS_API_SECRET_KEY
+    rm -f $var_subsys
+}
+
+status () {
+    echo -n "Registered in ELB: "
+    $prog status $TAG_ELB $AWS_API_ACCESS_KEY $AWS_API_SECRET_KEY
+}
+
+# See how we were called.
+case "$1" in
+    start|add)
+        start
+        ;;
+    stop|delete)
+        stop
+        ;;
+    status)
+        status
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo $"Usage: $0 {start|add|stop|delete|status|restart|help}"
+        RETVAL=2
+esac
+
+exit $RETVAL

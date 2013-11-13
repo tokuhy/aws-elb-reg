@@ -1,0 +1,6 @@
+# AWS Security Credentials
+AWS_API_ACCESS_KEY=''
+AWS_API_SECRET_KEY=''
+
+# ELB informational tag name
+TAG_ELB='elb'
